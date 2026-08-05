@@ -6,12 +6,17 @@
  * Tests ALL client operations against a live publication.
  * Creates temporary resources and cleans them up at the end.
  *
+ * Safety: aborts if the publication has any published posts to avoid
+ * accidentally running against a real publication with subscribers.
+ * Set E2E_ALLOW_LIVE=1 to override this check.
+ *
  * Required env vars:
  *   SUBSTACK_SID         — substack.sid cookie value
  *   SUBSTACK_PUBLICATION — publication domain (e.g. "yourname.substack.com")
  *
  * Optional env vars:
  *   SUBSTACK_CONNECT_SID — connect.sid cookie value (some accounts need it)
+ *   E2E_ALLOW_LIVE       — set to "1" to allow running on publications with existing posts
  *   E2E_SKIP_PUBLISH     — set to "1" to skip publish/unpublish (avoids sending emails)
  *   E2E_SKIP_SECTIONS    — set to "1" to skip section create/delete
  */
@@ -27,6 +32,7 @@ import type { Draft, Section } from '../lib/types.js';
 const SID = env('SUBSTACK_SID');
 const PUBLICATION = env('SUBSTACK_PUBLICATION');
 const CONNECT_SID = process.env.SUBSTACK_CONNECT_SID;
+const ALLOW_LIVE = process.env.E2E_ALLOW_LIVE === '1';
 const SKIP_PUBLISH = process.env.E2E_SKIP_PUBLISH === '1';
 const SKIP_SECTIONS = process.env.E2E_SKIP_SECTIONS === '1';
 
@@ -548,6 +554,7 @@ async function main(): Promise<void> {
   console.log('╚══════════════════════════════════════════════════╝');
   console.log('');
   console.log(`  Publication: ${PUBLICATION}`);
+  console.log(`  Allow live: ${ALLOW_LIVE}`);
   console.log(`  Skip publish: ${SKIP_PUBLISH}`);
   console.log(`  Skip sections: ${SKIP_SECTIONS}`);
   console.log(`  Time: ${new Date().toISOString()}`);
@@ -559,6 +566,27 @@ async function main(): Promise<void> {
     minRequestInterval: 750,
     debug: true,
   });
+
+  // --- Safety check ---
+  // Abort if publication has published posts (likely a real publication with subscribers)
+  // unless E2E_ALLOW_LIVE=1 is explicitly set
+  const counts = await client.getPostCounts();
+  console.log(
+    `\n  Post counts: ${counts.published} published, ${counts.drafts} drafts, ${counts.scheduled} scheduled`,
+  );
+
+  if (counts.published > 0 && !ALLOW_LIVE) {
+    console.error('\n  🛑 SAFETY ABORT: Publication has published posts.');
+    console.error('     This likely means real subscribers would receive notifications.');
+    console.error('     Set E2E_ALLOW_LIVE=1 to override this check.');
+    process.exit(1);
+  }
+
+  if (counts.published === 0) {
+    console.log('  ✅ Safety check passed: 0 published posts (test publication)');
+  } else {
+    console.log('  ⚠️  Running on live publication (E2E_ALLOW_LIVE=1)');
+  }
 
   try {
     await testDrafts(client);
