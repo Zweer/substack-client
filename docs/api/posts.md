@@ -109,11 +109,44 @@ Published posts are accessed via the `post_management` endpoints for admin/dashb
 
 ### Get Single Published Post
 
-**Endpoint:** `GET /api/v1/post/{id}`
+**Endpoint:** `GET /api/v1/posts/{slug}`
 
-**Response:** `200 OK` — Full post object with body, metadata, stats.
+**Note:** The endpoint uses the post **slug** (not numeric ID), and the path is `/posts/` (plural).
 
-**Error (draft/not published):** `404` — Returns HTML page, not JSON.
+**Response:** `200 OK`
+```json
+{
+  "id": 209923071,
+  "title": "Post Title",
+  "subtitle": "Post subtitle",
+  "slug": "post-title",
+  "type": "newsletter",
+  "audience": "everyone",
+  "post_date": "2026-08-05T13:02:59.228Z",
+  "is_published": true,
+  "section_id": 403948,
+  "publication_id": 9425834,
+  "canonical_url": "https://readechoes.substack.com/p/post-title",
+  "wordcount": 6,
+  "body_html": "<p>Post content as HTML</p>",
+  "truncated_body_text": "Post content as plain text",
+  "description": "Post subtitle",
+  "cover_image": null,
+  "reactions": {"❤": 0},
+  "reaction_count": 0,
+  "comment_count": 0,
+  "previous_post_slug": null,
+  "next_post_slug": null,
+  "publishedBylines": [{"id": 114676504, "name": "Nic Vane"}]
+}
+```
+
+**Important:**
+- Returns `body_html` (rendered HTML) and `truncated_body_text`, NOT `body` (ProseMirror JSON)
+- For ProseMirror JSON body, use `GET /api/v1/drafts/{id}` (admin endpoint, works for published posts too)
+- The old endpoint `GET /api/v1/post/{id}` (singular, numeric ID) returns 404 HTML — it's NOT a JSON API
+
+**Error (not found):** `404` with JSON `{"error": "Not found"}`
 
 **Note:** This endpoint only works for published posts. Unpublished drafts return 404. Use `GET /api/v1/drafts/{id}` for draft access.
 ---

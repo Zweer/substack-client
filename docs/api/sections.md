@@ -254,6 +254,36 @@ Response: `200 OK` — `{}`
 - Tags use UUIDs; sections use sequential numeric IDs
 - The publish dialog shows sections in a dropdown, tags in a separate combobox
 
+### Post-Tag CRUD
+
+**Create Tag:**
+```
+POST /api/v1/publication/post-tag
+```
+
+Request Body:
+```json
+{"name": "New Tag Name"}
+```
+
+Response: `200 OK`
+```json
+{
+  "id": "9425ea08-7807-41a3-b7a3-4e235337d48e",
+  "publication_id": 9425834,
+  "name": "New Tag Name",
+  "slug": "new-tag-name",
+  "hidden": false
+}
+```
+
+**Delete Tag:**
+```
+DELETE /api/v1/publication/post-tag/{tag_id}
+```
+
+Response: `200 OK` — `{}`
+
 ---
 
 ## Important Notes

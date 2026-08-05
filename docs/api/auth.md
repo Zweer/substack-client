@@ -136,3 +136,28 @@ The exact session TTL is not documented in responses. Based on observation:
 - Sessions last at least several days
 - The cookie does not include an explicit `Expires` header (session cookie)
 - The `substack.lli` JWT has a ~30 day expiry, but this is NOT the auth cookie
+
+## Rate Limiting
+
+Substack enforces rate limiting on API requests:
+
+**Response:** `429 Too Many Requests`
+```
+HTTP/1.1 429
+Content-Type: text/plain; charset=utf-8
+Content-Length: 17
+
+Too Many Requests
+```
+
+**Behavior:**
+- No `Retry-After` header is returned
+- No `X-RateLimit-*` headers are present
+- Threshold: approximately 25-30 concurrent requests to the same endpoint
+- Body: plain text `"Too Many Requests"` (not JSON)
+- Recovery: wait a few seconds and retry
+
+**Strategy for clients:**
+- Use exponential backoff since no `Retry-After` is provided
+- Start with 1-2 second delay, double on each retry
+- Limit concurrent requests (max ~10 parallel)
