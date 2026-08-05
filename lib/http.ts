@@ -225,6 +225,11 @@ function resolveBaseUrl(publication: string): string {
     return publication.replace(/\/$/, '');
   }
 
+  // Handle bare subdomain (e.g. "readechoes" → "https://readechoes.substack.com")
+  if (!publication.includes('.')) {
+    return `https://${publication}.substack.com`;
+  }
+
   return `https://${publication}`;
 }
 

@@ -47,6 +47,17 @@ describe('HttpClient', () => {
       });
       await client.get('drafts');
     });
+
+    it('should resolve bare subdomain name (no dots)', async () => {
+      server.use(http.get(`${API_PREFIX}/drafts`, () => HttpResponse.json({ ok: true })));
+
+      const client = new HttpClient({
+        publication: 'test',
+        sid: 's',
+        minRequestInterval: 0,
+      });
+      await client.get('drafts');
+    });
   });
 
   describe('cookie injection', () => {

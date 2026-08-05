@@ -61,6 +61,7 @@
     "prepare": "test -n \"$CI\" || lefthook install",
     "test": "vitest run",
     "test:coverage": "vitest run --coverage",
+    "test:e2e": "npx tsx scripts/e2e.ts",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {

@@ -21,11 +21,16 @@
  *   E2E_SKIP_SECTIONS    — set to "1" to skip section create/delete
  */
 
+import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 
 import { SubstackClient } from '../lib/client.js';
 import { SubstackAuthError, SubstackError, SubstackNotFoundError } from '../lib/errors.js';
 import type { Draft, Section } from '../lib/types.js';
+
+// --- Load .env ---
+
+loadDotEnv();
 
 // --- Config ---
 
@@ -37,6 +42,35 @@ const SKIP_PUBLISH = process.env.E2E_SKIP_PUBLISH === '1';
 const SKIP_SECTIONS = process.env.E2E_SKIP_SECTIONS === '1';
 
 // --- Helpers ---
+
+function loadDotEnv(): void {
+  try {
+    const envPath = join(import.meta.dirname, '..', '.env');
+    const content = readFileSync(envPath, 'utf-8');
+
+    for (const line of content.split('\n')) {
+      const trimmed = line.trim();
+      if (!trimmed || trimmed.startsWith('#')) continue;
+      const eqIndex = trimmed.indexOf('=');
+      if (eqIndex === -1) continue;
+      const key = trimmed.slice(0, eqIndex).trim();
+      let value = trimmed.slice(eqIndex + 1).trim();
+      // Strip surrounding quotes
+      if (
+        (value.startsWith('"') && value.endsWith('"')) ||
+        (value.startsWith("'") && value.endsWith("'"))
+      ) {
+        value = value.slice(1, -1);
+      }
+      // Only set if not already in environment (env vars take precedence)
+      if (!process.env[key]) {
+        process.env[key] = value;
+      }
+    }
+  } catch {
+    // .env file not found — rely on environment variables
+  }
+}
 
 const PREFIX = '[e2e]';
 const PASS = '✅';
