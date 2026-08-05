@@ -1,0 +1,17 @@
+# Changelog
+
+## 1.0.0 (2026-08-05)
+
+
+### Features
+
+* :sparkles: complete API coverage matching reverse-engineered docs ([c4b119d](https://github.com/Zweer/substack/commit/c4b119d3850e0cb5b8c91f2ed19f6aba0dac9279))
+* **auth:** :sparkles: implement HTTP client with retry and error ([ddeef84](https://github.com/Zweer/substack/commit/ddeef84bde855a7993eb58c8181a1ba9b6da944f))
+* **client:** :sparkles: implement core client with drafts, publish, ([2300b8c](https://github.com/Zweer/substack/commit/2300b8cc3b5560925179780e4456a37c5b63b1c5))
+* **types:** :sparkles: add type definitions and error classes ([e30fda9](https://github.com/Zweer/substack/commit/e30fda9adddf8e43b2b8847603b3792f50680610))
+
+
+### Bug Fixes
+
+* **e2e:** :lock: add safety guard and auto-load .env ([278b695](https://github.com/Zweer/substack/commit/278b695055c5f67ff85793e06e0edbfe3e75def6))
+* **e2e:** :lock: add safety guard to prevent running on live ([5370e3a](https://github.com/Zweer/substack/commit/5370e3a434b031068e7327a6a038e4b7534b068b))
