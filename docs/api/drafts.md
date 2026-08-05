@@ -222,7 +222,7 @@ In the API responses (after editor save), marks use ProseMirror standard names:
 | `paragraph` | `textAlign` | Standard paragraph |
 | `heading` | `level`, `textAlign` | Heading h1-h6 |
 | `bullet_list` | — | Unordered list (snake_case!) |
-| `ordered_list` | — | Ordered list |
+| `ordered_list` | `start` | Ordered list (start number, default 1) |
 | `list_item` | — | List item (contains paragraphs) |
 | `blockquote` | — | Blockquote |
 | `captionedImage` | `src`, `title`, etc. | Image with caption (camelCase!) |
