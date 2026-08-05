@@ -1,1 +1,1 @@
-export {};
+export { markdownToProseMirror } from './markdown.js';

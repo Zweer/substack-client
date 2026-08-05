@@ -15,26 +15,37 @@ afterEach(() => server.resetHandlers());
 afterAll(() => server.close());
 
 function createClient(): SubstackClient {
-  return new SubstackClient({ publication: BASE_URL, sid: 'test-sid', maxRetries: 1 });
+  return new SubstackClient({
+    publication: BASE_URL,
+    sid: 'test-sid',
+    maxRetries: 1,
+    minRequestInterval: 0,
+  });
 }
 
 const RAW_DRAFT = {
   id: 100,
+  uuid: 'test-uuid',
+  draft_title: 'Integration Test',
   title: 'Integration Test',
   draft_subtitle: null,
   slug: 'integration-test',
   audience: 'everyone',
   draft_section_id: null,
+  section_id: null,
   draft_created_at: '2026-07-03T10:00:00Z',
+  draft_updated_at: '2026-07-03T10:00:00Z',
   draft_body: '{"type":"doc","content":[]}',
+  is_published: false,
   draft_bylines: [{ id: 1, is_guest: false }],
+  publishedBylines: [{ id: 1, name: 'Test' }],
 };
 
-const RAW_SECTION = {
-  id: 50,
-  name: 'Fiction',
-  slug: 'fiction',
-  description: null,
+const DRAFT_LIST_RESPONSE = {
+  posts: [RAW_DRAFT],
+  offset: 0,
+  limit: 25,
+  total: 1,
 };
 
 describe('Integration: create → update → publish', () => {
@@ -42,6 +53,10 @@ describe('Integration: create → update → publish', () => {
     const calls: string[] = [];
 
     server.use(
+      http.get(`${API}/post_management/drafts`, () => {
+        calls.push('resolve-bylines');
+        return HttpResponse.json(DRAFT_LIST_RESPONSE);
+      }),
       http.post(`${API}/drafts`, () => {
         calls.push('create');
         return HttpResponse.json(RAW_DRAFT);
@@ -57,47 +72,42 @@ describe('Integration: create → update → publish', () => {
           draft_body: '{"type":"doc","content":[{"type":"paragraph"}]}',
         });
       }),
+      http.get(`${API}/drafts/100/prepublish`, () => {
+        calls.push('prepublish');
+        return HttpResponse.json({ ok: true });
+      }),
       http.post(`${API}/drafts/100/publish`, () => {
         calls.push('publish');
-        return HttpResponse.json({
-          id: 100,
-          post_date: '2026-07-03T12:00:00Z',
-          audience: 'everyone',
-        });
+        return HttpResponse.json({ id: 100, is_published: true });
       }),
     );
 
     const client = createClient();
     const draft = await client.createDraft({ title: 'My Post' });
-
     expect(draft.id).toBe(100);
 
     const updated = await client.updateDraft(draft.id, {
       body: '{"type":"doc","content":[{"type":"paragraph"}]}',
     });
-
     expect(updated.body).toBe('{"type":"doc","content":[{"type":"paragraph"}]}');
 
     await client.publish(draft.id);
-
-    expect(calls).toEqual(['create', 'get', 'update', 'publish']);
+    expect(calls).toEqual(['resolve-bylines', 'create', 'get', 'update', 'prepublish', 'publish']);
   });
 });
 
 describe('Integration: create → schedule', () => {
-  it('should create a draft and schedule for future', async () => {
+  it('should create a draft and schedule for future via /scheduled_release', async () => {
     server.use(
+      http.get(`${API}/post_management/drafts`, () => HttpResponse.json(DRAFT_LIST_RESPONSE)),
       http.post(`${API}/drafts`, () => HttpResponse.json(RAW_DRAFT)),
       http.get(`${API}/drafts/100`, () => HttpResponse.json(RAW_DRAFT)),
       http.put(`${API}/drafts/100`, () => HttpResponse.json(RAW_DRAFT)),
-      http.post(`${API}/drafts/100/publish`, async ({ request }) => {
+      http.post(`${API}/drafts/100/scheduled_release`, async ({ request }) => {
         const body = (await request.json()) as Record<string, unknown>;
-        expect(body.post_date).toBe('2026-09-01T09:00:00Z');
-        return HttpResponse.json({
-          id: 100,
-          post_date: '2026-09-01T09:00:00Z',
-          audience: 'only_paid',
-        });
+        expect(body.trigger_at).toBe('2026-09-01T09:00:00Z');
+        expect(body.post_audience).toBe('only_paid');
+        return HttpResponse.json({ id: 100 });
       }),
     );
 
@@ -110,17 +120,38 @@ describe('Integration: create → schedule', () => {
 
 describe('Integration: sections → assign to draft', () => {
   it('should list, create section, and assign to draft', async () => {
+    const RAW_SECTION = {
+      id: 50,
+      name: 'Fiction',
+      slug: 'fiction',
+      description: null,
+      is_live: true,
+      is_default_on: true,
+      sibling_rank: 0,
+    };
+
     server.use(
-      http.get(`${API}/sections`, () => HttpResponse.json([RAW_SECTION])),
-      http.post(`${API}/sections`, () =>
-        HttpResponse.json({ id: 51, name: 'Essays', slug: 'essays', description: null }),
+      http.get(`${API}/publication/sections`, () => HttpResponse.json([RAW_SECTION])),
+      http.post(`${API}/publication/sections`, () =>
+        HttpResponse.json({
+          section: {
+            id: 51,
+            name: 'Essays',
+            slug: 'essays',
+            description: null,
+            is_live: false,
+            is_default_on: true,
+            sibling_rank: 1,
+          },
+        }),
       ),
+      http.get(`${API}/post_management/drafts`, () => HttpResponse.json(DRAFT_LIST_RESPONSE)),
       http.post(`${API}/drafts`, () => HttpResponse.json(RAW_DRAFT)),
       http.get(`${API}/drafts/100`, () => HttpResponse.json(RAW_DRAFT)),
       http.put(`${API}/drafts/100`, async ({ request }) => {
         const body = (await request.json()) as Record<string, unknown>;
         expect(body.draft_section_id).toBe(51);
-        return HttpResponse.json({ ...RAW_DRAFT, draft_section_id: 51 });
+        return HttpResponse.json({ ...RAW_DRAFT, draft_section_id: 51, section_id: 51 });
       }),
     );
 
@@ -141,7 +172,7 @@ describe('Integration: sections → assign to draft', () => {
 describe('Integration: auth failure', () => {
   it('should throw SubstackAuthError on expired cookie', async () => {
     server.use(
-      http.get(`${API}/drafts`, () =>
+      http.get(`${API}/post_management/drafts`, () =>
         HttpResponse.json({ error: 'unauthorized' }, { status: 401 }),
       ),
     );
@@ -156,19 +187,24 @@ describe('Integration: retry flow', () => {
     let attempt = 0;
 
     server.use(
-      http.get(`${API}/drafts`, () => {
+      http.get(`${API}/post_management/drafts`, () => {
         attempt++;
         if (attempt <= 2) {
           return HttpResponse.json({}, { status: 503 });
         }
-        return HttpResponse.json([RAW_DRAFT]);
+        return HttpResponse.json(DRAFT_LIST_RESPONSE);
       }),
     );
 
-    const client = new SubstackClient({ publication: BASE_URL, sid: 'sid', maxRetries: 3 });
-    const drafts = await client.listDrafts();
+    const client = new SubstackClient({
+      publication: BASE_URL,
+      sid: 'sid',
+      maxRetries: 3,
+      minRequestInterval: 0,
+    });
+    const result = await client.listDrafts();
 
-    expect(drafts).toHaveLength(1);
+    expect(result.drafts).toHaveLength(1);
     expect(attempt).toBe(3);
   });
 });
@@ -187,7 +223,12 @@ describe('Integration: rate limit', () => {
       }),
     );
 
-    const client = new SubstackClient({ publication: BASE_URL, sid: 'sid', maxRetries: 2 });
+    const client = new SubstackClient({
+      publication: BASE_URL,
+      sid: 'sid',
+      maxRetries: 2,
+      minRequestInterval: 0,
+    });
     const draft = await client.getDraft(100);
 
     expect(draft.id).toBe(100);

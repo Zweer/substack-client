@@ -29,14 +29,22 @@ describe('HttpClient', () => {
         }),
       );
 
-      const client = new HttpClient({ publication: 'test.substack.com', sid: 's' });
+      const client = new HttpClient({
+        publication: 'test.substack.com',
+        sid: 's',
+        minRequestInterval: 0,
+      });
       await client.get('drafts');
     });
 
     it('should resolve full https URL', async () => {
       server.use(http.get(`${API_PREFIX}/drafts`, () => HttpResponse.json({ ok: true })));
 
-      const client = new HttpClient({ publication: 'https://test.substack.com', sid: 's' });
+      const client = new HttpClient({
+        publication: 'https://test.substack.com',
+        sid: 's',
+        minRequestInterval: 0,
+      });
       await client.get('drafts');
     });
   });
@@ -50,7 +58,11 @@ describe('HttpClient', () => {
         }),
       );
 
-      const client = new HttpClient({ publication: BASE_URL, sid: 'my-sid' });
+      const client = new HttpClient({
+        publication: BASE_URL,
+        sid: 'my-sid',
+        minRequestInterval: 0,
+      });
       await client.get('drafts');
     });
 
@@ -68,6 +80,7 @@ describe('HttpClient', () => {
         publication: BASE_URL,
         sid: 'my-sid',
         connectSid: 'my-connect',
+        minRequestInterval: 0,
       });
       await client.get('drafts');
     });
@@ -81,14 +94,14 @@ describe('HttpClient', () => {
         ),
       );
 
-      const client = new HttpClient({ publication: BASE_URL, sid: 's' });
+      const client = new HttpClient({ publication: BASE_URL, sid: 's', minRequestInterval: 0 });
       await expect(client.get('drafts')).rejects.toThrow(SubstackAuthError);
     });
 
     it('should throw SubstackAuthError on 403', async () => {
       server.use(http.get(`${API_PREFIX}/drafts`, () => HttpResponse.json({}, { status: 403 })));
 
-      const client = new HttpClient({ publication: BASE_URL, sid: 's' });
+      const client = new HttpClient({ publication: BASE_URL, sid: 's', minRequestInterval: 0 });
       await expect(client.get('drafts')).rejects.toThrow(SubstackAuthError);
     });
 
@@ -97,7 +110,7 @@ describe('HttpClient', () => {
         http.get(`${API_PREFIX}/drafts/999`, () => HttpResponse.json({}, { status: 404 })),
       );
 
-      const client = new HttpClient({ publication: BASE_URL, sid: 's' });
+      const client = new HttpClient({ publication: BASE_URL, sid: 's', minRequestInterval: 0 });
       await expect(client.get('drafts/999')).rejects.toThrow(SubstackNotFoundError);
     });
 
@@ -108,14 +121,19 @@ describe('HttpClient', () => {
         ),
       );
 
-      const client = new HttpClient({ publication: BASE_URL, sid: 's', maxRetries: 0 });
+      const client = new HttpClient({
+        publication: BASE_URL,
+        sid: 's',
+        maxRetries: 0,
+        minRequestInterval: 0,
+      });
       await expect(client.get('drafts')).rejects.toThrow(SubstackRateLimitError);
     });
 
     it('should throw SubstackError on other 4xx', async () => {
       server.use(http.get(`${API_PREFIX}/drafts`, () => HttpResponse.json({}, { status: 422 })));
 
-      const client = new HttpClient({ publication: BASE_URL, sid: 's' });
+      const client = new HttpClient({ publication: BASE_URL, sid: 's', minRequestInterval: 0 });
       const error = await client.get('drafts').catch((e: SubstackError) => e);
 
       expect(error).toBeInstanceOf(SubstackError);
@@ -132,7 +150,12 @@ describe('HttpClient', () => {
         }),
       );
 
-      const client = new HttpClient({ publication: BASE_URL, sid: 's', maxRetries: 3 });
+      const client = new HttpClient({
+        publication: BASE_URL,
+        sid: 's',
+        maxRetries: 3,
+        minRequestInterval: 0,
+      });
       await expect(client.get('drafts')).rejects.toThrow(SubstackError);
       expect(callCount).toBe(1);
     });
@@ -152,7 +175,7 @@ describe('HttpClient', () => {
         }),
       );
 
-      const client = new HttpClient({ publication: BASE_URL, sid: 's' });
+      const client = new HttpClient({ publication: BASE_URL, sid: 's', minRequestInterval: 0 });
       const result = await client.get<{ success: boolean }>('drafts');
 
       expect(result.success).toBe(true);
@@ -169,7 +192,12 @@ describe('HttpClient', () => {
         }),
       );
 
-      const client = new HttpClient({ publication: BASE_URL, sid: 's', maxRetries: 2 });
+      const client = new HttpClient({
+        publication: BASE_URL,
+        sid: 's',
+        maxRetries: 2,
+        minRequestInterval: 0,
+      });
       await expect(client.get('drafts')).rejects.toThrow(SubstackError);
       expect(callCount).toBe(3); // initial + 2 retries
     });
@@ -187,7 +215,7 @@ describe('HttpClient', () => {
         }),
       );
 
-      const client = new HttpClient({ publication: BASE_URL, sid: 's' });
+      const client = new HttpClient({ publication: BASE_URL, sid: 's', minRequestInterval: 0 });
       const start = Date.now();
       await client.get('drafts');
       const elapsed = Date.now() - start;
@@ -211,6 +239,7 @@ describe('HttpClient', () => {
         sid: 's',
         timeout: 100,
         maxRetries: 0,
+        minRequestInterval: 0,
       });
       await expect(client.get('drafts')).rejects.toThrow();
     });
@@ -226,7 +255,7 @@ describe('HttpClient', () => {
         }),
       );
 
-      const client = new HttpClient({ publication: BASE_URL, sid: 's' });
+      const client = new HttpClient({ publication: BASE_URL, sid: 's', minRequestInterval: 0 });
       const result = await client.post<{ id: number }>('drafts', { title: 'Hello' });
       expect(result.id).toBe(1);
     });
@@ -240,7 +269,7 @@ describe('HttpClient', () => {
         }),
       );
 
-      const client = new HttpClient({ publication: BASE_URL, sid: 's' });
+      const client = new HttpClient({ publication: BASE_URL, sid: 's', minRequestInterval: 0 });
       const result = await client.put<{ id: number }>('drafts/1', { draft_title: 'Updated' });
       expect(result.id).toBe(1);
     });
@@ -248,7 +277,7 @@ describe('HttpClient', () => {
     it('should send DELETE', async () => {
       server.use(http.delete(`${API_PREFIX}/drafts/1`, () => HttpResponse.json({ deleted: true })));
 
-      const client = new HttpClient({ publication: BASE_URL, sid: 's' });
+      const client = new HttpClient({ publication: BASE_URL, sid: 's', minRequestInterval: 0 });
       const result = await client.delete<{ deleted: boolean }>('drafts/1');
       expect(result.deleted).toBe(true);
     });
@@ -263,7 +292,7 @@ describe('HttpClient', () => {
         }),
       );
 
-      const client = new HttpClient({ publication: BASE_URL, sid: 's' });
+      const client = new HttpClient({ publication: BASE_URL, sid: 's', minRequestInterval: 0 });
       await client.get('drafts', { offset: '10', limit: '5' });
     });
   });

@@ -11,6 +11,7 @@ import type { SubstackClientOptions } from './types.js';
 
 const DEFAULT_TIMEOUT = 30_000;
 const DEFAULT_MAX_RETRIES = 3;
+const DEFAULT_MIN_REQUEST_INTERVAL = 500;
 const RETRY_BASE_DELAY = 1_000;
 const RETRY_MAX_DELAY = 30_000;
 
@@ -40,13 +41,16 @@ export class HttpClient {
   private readonly cookieHeader: string;
   private readonly timeout: number;
   private readonly maxRetries: number;
+  private readonly minRequestInterval: number;
   private readonly debug: boolean;
+  private lastRequestTime = 0;
 
   constructor(options: SubstackClientOptions) {
     this.baseUrl = resolveBaseUrl(options.publication);
     this.cookieHeader = buildCookieHeader(options.sid, options.connectSid);
     this.timeout = options.timeout ?? DEFAULT_TIMEOUT;
     this.maxRetries = options.maxRetries ?? DEFAULT_MAX_RETRIES;
+    this.minRequestInterval = options.minRequestInterval ?? DEFAULT_MIN_REQUEST_INTERVAL;
     this.debug = options.debug ?? false;
   }
 
@@ -63,6 +67,11 @@ export class HttpClient {
   async put<T>(path: string, body?: unknown): Promise<T> {
     const url = this.buildUrl(path);
     return this.request<T>('PUT', url, body);
+  }
+
+  async patch<T>(path: string, body?: unknown): Promise<T> {
+    const url = this.buildUrl(path);
+    return this.request<T>('PATCH', url, body);
   }
 
   async delete<T>(path: string): Promise<T> {
@@ -95,7 +104,9 @@ export class HttpClient {
         const response = await this.sendRequest(method, url, body);
 
         if (response.ok) {
-          return (await response.json()) as T;
+          const text = await response.text();
+          if (!text) return undefined as T;
+          return JSON.parse(text) as T;
         }
 
         const endpoint = `${method} ${url}`;
@@ -144,6 +155,14 @@ export class HttpClient {
   }
 
   private async sendRequest(method: string, url: string, body?: unknown): Promise<Response> {
+    // Proactive rate limiting: ensure minimum interval between requests
+    const now = Date.now();
+    const elapsed = now - this.lastRequestTime;
+    if (this.lastRequestTime > 0 && elapsed < this.minRequestInterval) {
+      await sleep(this.minRequestInterval - elapsed);
+    }
+    this.lastRequestTime = Date.now();
+
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), this.timeout);
 
