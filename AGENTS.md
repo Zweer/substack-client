@@ -6,7 +6,7 @@ Universal steering file for AI agents working on this project.
 
 **substack-client** is a TypeScript library that wraps Substack's internal API for publishing, scheduling, and managing posts programmatically. No official Substack API exists for writing — this library reverse-engineers the internal endpoints.
 
-The library covers: drafts CRUD, publish/schedule/unpublish, sections, markdown-to-ProseMirror transform, notes, and read operations.
+The library covers: drafts CRUD, publish/schedule/unpublish, sections, images, notes, markdown-to-ProseMirror transform, and read operations.
 
 ## Stack
 
@@ -18,24 +18,67 @@ The library covers: drafts CRUD, publish/schedule/unpublish, sections, markdown-
 - **Lint/Format:** Biome
 - **Package:** `@zweer/substack-client` (npm)
 
+## Agent Architecture
+
+This project uses two specialized Kiro agents:
+
+### `rev-eng` — Reverse Engineering Agent
+- **Purpose:** Discover Substack's internal API by navigating the web UI with Playwright
+- **Input:** Substack credentials (`.env`)
+- **Output:** API documentation in `docs/api/*.md`
+- **Tools:** Playwright MCP (browser automation + network interception)
+
+### `dev` — Development Agent
+- **Purpose:** Implement the TypeScript library from the API docs
+- **Input:** `docs/api/*.md` (produced by rev-eng)
+- **Output:** `lib/`, `test/`, types, client code
+
+### Workflow
+
+```
+rev-eng (Playwright) → docs/api/*.md → dev (implementation) → lib/ + test/
+```
+
+1. `rev-eng` navigates Substack, captures network traffic, documents every endpoint
+2. `dev` reads the docs and implements type-safe wrappers
+
 ## Documentation Structure
 
 ```
 docs/
+├── api/               # Reverse-engineered API reference (rev-eng output)
+│   ├── auth.md
+│   ├── drafts.md
+│   ├── publish.md
+│   ├── sections.md
+│   ├── images.md
+│   ├── notes.md
+│   └── posts.md
 ├── conventions/       # Code style, tooling, testing, commit rules
 ├── workflows/         # Cognitive modes (plan-product, plan-eng, code-review, ship-prep)
-├── specs/             # Feature specs (requirements → design → tasks → testlist)
-│   ├── 01-core-client/
-│   ├── 02-markdown-transform/
-│   └── ✅_xx-name/    # ✅ prefix = completed spec
-└── substack-api.md    # Reverse-engineered API reference
+└── specs/             # Feature specs (requirements → design → tasks → testlist)
 ```
 
-Follow the conventions in `docs/conventions/`. When invoking workflow modes, refer to `docs/workflows/`.
+## Kiro Configuration
+
+```
+.kiro/
+├── agents/
+│   ├── rev-eng.json   # Agent definition (Playwright MCP, write to docs/api/)
+│   └── dev.json       # Agent definition (full dev tools, write to lib/test/)
+├── prompts/
+│   ├── rev-eng.md     # Detailed instructions for API discovery
+│   └── dev.md         # Detailed instructions for implementation
+└── steering/
+    ├── interaction.md
+    ├── code-style.md
+    ├── build-tooling.md
+    └── commit-conventions.md
+```
 
 ## Conventions (Summary)
 
-Full details in `docs/conventions/`. Key rules:
+Full details in `.kiro/steering/`. Key rules:
 
 - TypeScript strict, no `any`, explicit return types on exports
 - ES modules with `.js` extensions in imports
@@ -76,15 +119,3 @@ Skip planning for single-file fixes, small bug fixes, or simple questions.
 | `ship prep` | Release Engineer | Final checklist before commit |
 
 Details for each mode in `docs/workflows/`.
-
-## Specs
-
-Feature specs live in `docs/specs/{nn-name}/` with:
-- `requirements.md` — Functional requirements (what it does, user stories, acceptance criteria)
-- `design.md` — Technical design (architecture, types, interfaces, data flow)
-- `tasks.md` — Atomic implementation tasks (technical, with dependencies)
-- `testlist.md` — Test matrix (unit/integration with status ⬜/✅)
-
-## Kiro Users
-
-This project intentionally keeps zero `.kiro/` configuration. All steering, specs, and workflows live in standard markdown files that any AI agent can consume. If using Kiro CLI, `AGENTS.md` and `README.md` are loaded automatically by the default agent.
