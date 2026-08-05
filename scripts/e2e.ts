@@ -193,18 +193,18 @@ async function testDrafts(client: SubstackClient): Promise<void> {
 
   // --- List ---
   await test('listDrafts — returns array containing our draft', async () => {
-    const drafts = await client.listDrafts();
+    const result = await client.listDrafts();
 
-    assert(Array.isArray(drafts), 'should return array');
-    assert(drafts.length > 0, 'should have at least 1 draft');
-    const found = drafts.find((d) => d.id === draft.id);
+    assert(Array.isArray(result.drafts), 'should return drafts array');
+    assert(result.drafts.length > 0, 'should have at least 1 draft');
+    const found = result.drafts.find((d) => d.id === draft.id);
     assertDefined(found, 'our draft should be in the list');
   });
 
   // --- List with pagination ---
   await test('listDrafts — supports limit parameter', async () => {
-    const drafts = await client.listDrafts({ limit: 1 });
-    assertEqual(drafts.length, 1, 'should return exactly 1 draft');
+    const result = await client.listDrafts({ limit: 1 });
+    assertEqual(result.drafts.length, 1, 'should return exactly 1 draft');
   });
 
   // --- Create second draft for delete test ---
@@ -388,11 +388,11 @@ async function testPublish(client: SubstackClient): Promise<void> {
     // Schedule for 7 days from now
     const futureDate = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString();
 
-    await client.schedule(scheduledDraft.id, { date: futureDate, send: false });
+    await client.schedule(scheduledDraft.id, { date: futureDate });
     // If no error thrown, schedule succeeded
 
-    // Unpublish to revert to draft (so cleanup can delete it)
-    await client.unpublish(scheduledDraft.id);
+    // Unschedule to revert to draft (so cleanup can delete it)
+    await client.unschedule(scheduledDraft.id);
   });
 }
 
