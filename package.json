@@ -1,6 +1,6 @@
 {
   "name": "@zweer/substack-client",
-  "version": "0.0.0",
+  "version": "1.0.0",
   "description": "A TypeScript client for Substack's internal API. Publish, schedule, and manage posts programmatically.",
   "keywords": [
     "substack",
