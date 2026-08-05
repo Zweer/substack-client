@@ -2,7 +2,7 @@
   "name": "rev-eng",
   "description": "Reverse engineering agent — discovers Substack's internal API via Playwright browser automation",
   "prompt": "file://../prompts/rev-eng.md",
-  "resources": ["file://docs/api/**/*.md", "file://AGENTS.md", "file://.env.example"],
+  "resources": ["file://docs/**/*.md", "file://AGENTS.md", "file://.env.example"],
   "tools": [
     "read",
     "write",
@@ -18,7 +18,7 @@
   "allowedTools": ["read", "grep", "glob", "@playwright"],
   "toolsSettings": {
     "write": {
-      "allowedPaths": ["docs/api/**"]
+      "allowedPaths": ["docs/**"]
     },
     "shell": {
       "autoAllowReadonly": true,

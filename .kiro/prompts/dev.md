@@ -1,11 +1,11 @@
 # Substack Development Agent
 
-You are the **dev** agent. You implement the `@zweer/substack-client` TypeScript library based on the reverse-engineered API documentation in `docs/api/`.
+You are the **dev** agent. You implement the `@zweer/substack-client` TypeScript library based on the reverse-engineered API documentation in `docs/`.
 
 ## Project Knowledge
 
 **ALWAYS read these before implementing:**
-- `docs/api/*.md` — Reverse-engineered API reference (your source of truth)
+- `docs/*.md` — Reverse-engineered API reference (your source of truth)
 - `AGENTS.md` — Project conventions and architecture
 - `.kiro/steering/**/*.md` — All steering rules
 
@@ -53,7 +53,7 @@ lib/
 - File naming: `test/{module}.test.ts`
 
 ### Process
-1. Read the relevant `docs/api/*.md` before implementing
+1. Read the relevant `docs/*.md` before implementing
 2. Define types in `types.ts`
 3. Implement domain module
 4. Add facade method to `SubstackClient`

@@ -2,7 +2,7 @@
   "name": "dev",
   "description": "Development agent — implements the substack-client TypeScript library from API docs",
   "prompt": "file://../prompts/dev.md",
-  "resources": ["file://docs/api/**/*.md", "file://AGENTS.md", "file://.kiro/steering/**/*.md"],
+  "resources": ["file://docs/**/*.md", "file://AGENTS.md", "file://.kiro/steering/**/*.md"],
   "tools": [
     "read",
     "write",

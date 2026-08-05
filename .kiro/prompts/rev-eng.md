@@ -4,7 +4,7 @@ You are the **rev-eng** agent. Your job is to discover and document Substack's i
 
 ## Goal
 
-Produce complete, accurate API documentation in `docs/api/` that the `dev` agent can use to implement the TypeScript library.
+Produce complete, accurate API documentation in `docs/` that the `dev` agent can use to implement the TypeScript library.
 
 ## Tools Available
 
@@ -60,7 +60,7 @@ Before performing any UI action, use Playwright's network interception to captur
 
 Navigate to the relevant section of the Substack dashboard and perform actions (create draft, publish, manage sections, etc.). Let the network logger capture everything.
 
-### Step 3: Document in `docs/api/`
+### Step 3: Document in `docs/`
 
 Write one markdown file per area with this exact format:
 
@@ -113,13 +113,13 @@ After documenting an endpoint, replay it using Playwright's `request` API to con
 
 ## Target Areas (in order)
 
-1. **Auth** → `docs/api/auth.md`
+1. **Auth** → `docs/auth.md`
    - How the `substack.sid` cookie works
    - Session validation (how to check if cookie is still valid)
    - What headers are needed on every request
    - Error response when cookie is expired/invalid (401/403)
 
-2. **Drafts** → `docs/api/drafts.md`
+2. **Drafts** → `docs/drafts.md`
    - List all drafts
    - Create a new draft (the two-step process: POST creates shell, PUT adds body)
    - Get single draft
@@ -127,7 +127,7 @@ After documenting an endpoint, replay it using Playwright's `request` API to con
    - Delete draft
    - ProseMirror document format (the `draft_body` field)
 
-3. **Publishing** → `docs/api/publish.md`
+3. **Publishing** → `docs/publish.md`
    - Publish a draft immediately
    - Schedule for future date
    - Unpublish a post
@@ -135,24 +135,24 @@ After documenting an endpoint, replay it using Playwright's `request` API to con
    - Paywall node placement
    - The `send` flag (email to subscribers)
 
-4. **Sections** → `docs/api/sections.md`
+4. **Sections** → `docs/sections.md`
    - List sections/categories
    - Create section
    - Update section
    - Delete section
    - Assign post to section (`draft_section_id` vs UUID tags)
 
-5. **Images** → `docs/api/images.md`
+5. **Images** → `docs/images.md`
    - Upload images (base64 data URI format, NOT multipart)
    - Get CDN URLs
    - Embed in ProseMirror body
 
-6. **Notes** → `docs/api/notes.md`
+6. **Notes** → `docs/notes.md`
    - Create a note
    - List notes
    - Delete note
 
-7. **Posts (Read)** → `docs/api/posts.md`
+7. **Posts (Read)** → `docs/posts.md`
    - List published posts
    - Get single post
    - Post metadata (stats, audience, etc.)

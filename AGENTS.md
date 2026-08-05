@@ -45,18 +45,14 @@ rev-eng (Playwright) → docs/api/*.md → dev (implementation) → lib/ + test/
 ## Documentation Structure
 
 ```
-docs/
-├── api/               # Reverse-engineered API reference (rev-eng output)
-│   ├── auth.md
-│   ├── drafts.md
-│   ├── publish.md
-│   ├── sections.md
-│   ├── images.md
-│   ├── notes.md
-│   └── posts.md
-├── conventions/       # Code style, tooling, testing, commit rules
-├── workflows/         # Cognitive modes (plan-product, plan-eng, code-review, ship-prep)
-└── specs/             # Feature specs (requirements → design → tasks → testlist)
+docs/                  # Reverse-engineered API reference (rev-eng output)
+├── auth.md
+├── drafts.md
+├── publish.md
+├── sections.md
+├── images.md
+├── notes.md
+└── posts.md
 ```
 
 ## Kiro Configuration
@@ -73,7 +69,11 @@ docs/
     ├── interaction.md
     ├── code-style.md
     ├── build-tooling.md
-    └── commit-conventions.md
+    ├── commit-conventions.md
+    ├── code-review.md
+    ├── plan-product.md
+    ├── plan-eng.md
+    └── ship-prep.md
 ```
 
 ## Conventions (Summary)
@@ -118,4 +118,4 @@ Skip planning for single-file fixes, small bug fixes, or simple questions.
 | `code review` | Paranoid Reviewer | After implementation, before committing |
 | `ship prep` | Release Engineer | Final checklist before commit |
 
-Details for each mode in `docs/workflows/`.
+Details for each mode in `.kiro/steering/`.
