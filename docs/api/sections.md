@@ -186,7 +186,48 @@ Substack maintains two parallel categorization systems:
 - Used for additional tagging/filtering
 - Posts can have MULTIPLE tags
 - Listed via `GET /api/v1/publication/post-tag`
-- Assigned per-post via `GET /api/v1/post/{id}/tag`
+- Assigned per-post via `POST /api/v1/post/{id}/tag/{tag_id}`
+- Listed per-post via `GET /api/v1/post/{id}/tag`
+- Removed via `DELETE /api/v1/post/{id}/tag/{tag_id}`
+
+**Assign Tag to Post:**
+```
+POST /api/v1/post/{post_id}/tag/{tag_id}
+```
+
+Response: `200 OK`
+```json
+{
+  "id": "c92eb033-b1a1-43e5-8f97-b6bf54fcd0dc",
+  "publication_id": 9425834,
+  "post_id": 209912193,
+  "post_tag_id": "c197b803-ecc6-46c8-93ad-2a18c5ed3876"
+}
+```
+
+**List Tags on Post:**
+```
+GET /api/v1/post/{post_id}/tag
+```
+
+Response: `200 OK`
+```json
+[
+  {
+    "id": "c92eb033-b1a1-43e5-8f97-b6bf54fcd0dc",
+    "publication_id": 9425834,
+    "post_id": 209912193,
+    "post_tag_id": "c197b803-ecc6-46c8-93ad-2a18c5ed3876"
+  }
+]
+```
+
+**Remove Tag from Post:**
+```
+DELETE /api/v1/post/{post_id}/tag/{tag_id}
+```
+
+Response: `200 OK` — `{}`
 
 **Post-Tag List Response:**
 ```json

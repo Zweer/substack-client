@@ -153,6 +153,14 @@ Drafts are created and managed through a two-step process: POST creates a shell 
 
 **Response:** `200 OK` — Returns the full updated draft object (same shape as GET).
 
+**Optimistic Locking:**
+- If `last_updated_at` is provided and doesn't match the server's value, returns `409 Conflict`:
+  ```json
+  {"error": "Post is out of date", "type": "single"}
+  ```
+- If `last_updated_at` is **omitted**, the PUT succeeds without locking (bypass).
+- Best practice: always include `last_updated_at` from the previous GET/PUT response.
+
 ---
 
 ### Get Draft

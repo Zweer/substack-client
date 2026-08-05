@@ -33,5 +33,5 @@ The `rev-eng` agent:
 - [x] publish.md
 - [x] sections.md
 - [x] images.md
-- [ ] notes.md
-- [ ] posts.md
+- [x] notes.md (partially — POST blocked by Cloudflare WAF in headless context)
+- [x] posts.md

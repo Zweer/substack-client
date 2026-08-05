@@ -116,7 +116,6 @@ Published posts are accessed via the `post_management` endpoints for admin/dashb
 **Error (draft/not published):** `404` — Returns HTML page, not JSON.
 
 **Note:** This endpoint only works for published posts. Unpublished drafts return 404. Use `GET /api/v1/drafts/{id}` for draft access.
-
 ---
 
 ### List Drafts (Admin)
