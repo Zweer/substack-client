@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.0.1](https://github.com/Zweer/substack/compare/substack-client-v1.0.0...substack-client-v1.0.1) (2026-08-06)
+
+
+### Bug Fixes
+
+* :bug: fix repository URLs and local publish ([ab03166](https://github.com/Zweer/substack/commit/ab031667f7de92a153e44ec1afcc4cd539d6d0c2))
+
 ## 1.0.0 (2026-08-05)
 
 
