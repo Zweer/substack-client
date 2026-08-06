@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.0.2](https://github.com/Zweer/substack/compare/substack-client-v1.0.1...substack-client-v1.0.2) (2026-08-06)
+
+
+### Bug Fixes
+
+* **ci:** :wrench: fix npm publish auth using OIDC provenance ([79617a6](https://github.com/Zweer/substack/commit/79617a6bbead0e58503d1f8c068200421a20d39d))
+
 ## [1.0.1](https://github.com/Zweer/substack/compare/substack-client-v1.0.0...substack-client-v1.0.1) (2026-08-06)
 
 
