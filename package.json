@@ -9,13 +9,13 @@
     "publish",
     "newsletter"
   ],
-  "homepage": "https://github.com/Zweer/substack#readme",
+  "homepage": "https://github.com/Zweer/substack-client#readme",
   "bugs": {
-    "url": "https://github.com/Zweer/substack/issues"
+    "url": "https://github.com/Zweer/substack-client/issues"
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/Zweer/substack.git"
+    "url": "https://github.com/Zweer/substack-client.git"
   },
   "license": "MIT",
   "author": "Zweer <n.olivieriachille@gmail.com>",
