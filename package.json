@@ -18,7 +18,7 @@
     "url": "https://github.com/Zweer/substack.git"
   },
   "license": "MIT",
-  "author": "Niccolò Vanin",
+  "author": "Zweer <n.olivieriachille@gmail.com>",
   "type": "module",
   "exports": {
     ".": {
