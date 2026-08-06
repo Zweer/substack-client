@@ -9,13 +9,13 @@
     "publish",
     "newsletter"
   ],
-  "homepage": "https://github.com/nicvane/substack-client#readme",
+  "homepage": "https://github.com/Zweer/substack#readme",
   "bugs": {
-    "url": "https://github.com/nicvane/substack-client/issues"
+    "url": "https://github.com/Zweer/substack/issues"
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/nicvane/substack-client.git"
+    "url": "https://github.com/Zweer/substack.git"
   },
   "license": "MIT",
   "author": "Niccolò Vanin",

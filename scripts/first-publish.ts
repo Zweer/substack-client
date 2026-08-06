@@ -70,7 +70,7 @@ async function main(): Promise<void> {
   console.log(`\n🚢 Publishing ${name} for the first time...`);
 
   try {
-    execSync('npm publish --access public', { stdio: 'inherit' });
+    execSync('npm publish --access public --provenance=false', { stdio: 'inherit' });
     console.log(`\n✅ ${name} published successfully!`);
     console.log('   Now configure npm OIDC trust for this repo:');
     console.log('   https://docs.npmjs.com/generating-provenance-statements');
