@@ -65,7 +65,7 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "marked": "^15.0.7"
+    "marked": "^18.0.10"
   },
   "devDependencies": {
     "@biomejs/biome": "^2.5.6",
