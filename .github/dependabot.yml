@@ -10,8 +10,8 @@ updates:
     reviewers:
       - zweer
     commit-message:
-      prefix: "perf"
-      prefix-development: "chore"
+      prefix: "fix(deps)"
+      prefix-development: "build(deps-dev)"
       include: "scope"
     labels:
       - dependencies
