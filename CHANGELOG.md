@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.1.1](https://github.com/Zweer/substack-client/compare/v1.1.0...v1.1.1) (2026-08-21)
+
+
+### Bug Fixes
+
+* :truck: update repository URLs after rename to substack-client ([0bd7f0d](https://github.com/Zweer/substack-client/commit/0bd7f0d94ef46ab68860ab057c0d4f9e9680b0a6))
+
 ## [1.1.0](https://github.com/Zweer/substack-client/compare/v1.0.2...v1.1.0) (2026-08-06)
 
 
